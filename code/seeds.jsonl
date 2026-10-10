@@ -1,0 +1,64 @@
+{"type": 1, "nl": ["[d]的病因是什么？", "引起[d]的原因有哪些？"], "gql": "MATCH (d:Disease{name:'[d]'}) RETURN d.cause"}
+{"type": 1, "nl": ["请简要介绍一下[d]。", "[d]是一种什么疾病？"], "gql": "MATCH (d:Disease{name:'[d]'}) RETURN d.description"}
+{"type": 1, "nl": ["如何预防[d]？", "[d]有哪些预防措施？"], "gql": "MATCH (d:Disease{name:'[d]'}) RETURN d.prevent"}
+{"type": 1, "nl": ["[d]的治愈率是多少？", "[d]能治好的概率有多大？"], "gql": "MATCH (d:Disease{name:'[d]'}) RETURN d.cured_prob"}
+{"type": 1, "nl": ["[d]的患病比例是多少？", "[d]的发病率有多高？"], "gql": "MATCH (d:Disease{name:'[d]'}) RETURN d.get_prob"}
+{"type": 1, "nl": ["[d]需要治疗多长时间？", "[d]的治疗周期是多久？"], "gql": "MATCH (d:Disease{name:'[d]'}) RETURN d.cure_lasttime"}
+{"type": 1, "nl": ["治疗[d]大概需要多少钱？", "[d]的治疗费用是多少？"], "gql": "MATCH (d:Disease{name:'[d]'}) RETURN d.cost_money"}
+{"type": 1, "nl": ["哪些人容易得[d]？", "[d]的易感人群是哪些？"], "gql": "MATCH (d:Disease{name:'[d]'}) RETURN d.easy_get"}
+{"type": 2, "nl": ["[k]的疾病中治愈率最高的是哪种？", "在[k]就诊的疾病里，哪种疾病治愈率最高？"], "gql": "MATCH (d:Disease)-[:belongs_to]->(k:Department{name:'[k]'}) WHERE d.cured_prob_pct IS NOT NULL RETURN d.name ORDER BY d.cured_prob_pct DESC LIMIT 1"}
+{"type": 2, "nl": ["[k]中患病比例最低的[m]种疾病是什么？", "列出[k]里发病率最低的[m]种疾病。"], "gql": "MATCH (d:Disease)-[:belongs_to]->(k:Department{name:'[k]'}) WHERE d.get_prob_pct IS NOT NULL RETURN d.name ORDER BY d.get_prob_pct ASC LIMIT [m]", "m": [2, 3, 5]}
+{"type": 2, "nl": ["[k]的疾病中治疗周期最长的是哪种？", "[k]里哪种疾病需要治疗的天数最多？"], "gql": "MATCH (d:Disease)-[:belongs_to]->(k:Department{name:'[k]'}) WHERE d.cure_days IS NOT NULL RETURN d.name ORDER BY d.cure_days DESC LIMIT 1"}
+{"type": 2, "nl": ["[k]中最高治疗费用排名前[m]的疾病有哪些？", "在[k]，哪[m]种疾病的最高治疗费用最高？"], "gql": "MATCH (d:Disease)-[:belongs_to]->(k:Department{name:'[k]'}) WHERE d.cost_max IS NOT NULL RETURN d.name ORDER BY d.cost_max DESC LIMIT [m]", "m": [3, 5]}
+{"type": 2, "nl": ["有[s]症状的疾病中，治愈率最低的是哪种？", "出现[s]的疾病里哪种最难治愈（治愈率最低）？"], "gql": "MATCH (d:Disease)-[:has_symptom]->(s:Symptom{name:'[s]'}) WHERE d.cured_prob_pct IS NOT NULL RETURN d.name ORDER BY d.cured_prob_pct ASC LIMIT 1"}
+{"type": 2, "nl": ["哪种症状关联的疾病数量最多？", "关联疾病最多的症状是什么？"], "gql": "MATCH (d:Disease)-[:has_symptom]->(s:Symptom) WITH s, count(d) AS n RETURN s.name ORDER BY n DESC LIMIT 1"}
+{"type": 2, "nl": ["推荐药品数量排名前[m]的疾病是哪些？", "哪[m]种疾病的推荐药品最多？"], "gql": "MATCH (d:Disease)-[:recommand_drug]->(g:Drug) WITH d, count(g) AS n RETURN d.name ORDER BY n DESC LIMIT [m]", "m": [1, 3, 5, 10]}
+{"type": 2, "nl": ["[d]的并发症中治愈率最高的是哪个？", "在[d]的并发症里，哪种疾病的治愈率最高？"], "gql": "MATCH (d:Disease{name:'[d]'})-[:acompany_with]->(x:Disease) WHERE x.cured_prob_pct IS NOT NULL RETURN x.name ORDER BY x.cured_prob_pct DESC LIMIT 1"}
+{"type": 3, "nl": ["[d]有哪些症状？", "得了[d]会有什么表现？"], "gql": "MATCH (d:Disease{name:'[d]'})-[:has_symptom]->(s:Symptom) RETURN s.name"}
+{"type": 3, "nl": ["[d]需要做哪些检查？", "诊断[d]要做什么检查？"], "gql": "MATCH (d:Disease{name:'[d]'})-[:need_check]->(c:Check) RETURN c.name"}
+{"type": 3, "nl": ["[d]的常用药品有哪些？", "治疗[d]常用什么药？"], "gql": "MATCH (d:Disease{name:'[d]'})-[:common_drug]->(g:Drug) RETURN g.name"}
+{"type": 3, "nl": ["[d]的并发症有哪些？", "[d]可能会并发哪些疾病？"], "gql": "MATCH (d:Disease{name:'[d]'})-[:acompany_with]->(x:Disease) RETURN x.name"}
+{"type": 3, "nl": ["[s]可能是哪些疾病的症状？", "出现[s]可能是得了什么病？"], "gql": "MATCH (d:Disease)-[:has_symptom]->(s:Symptom{name:'[s]'}) RETURN d.name"}
+{"type": 3, "nl": ["[d]常用药品的生产厂家有哪些？", "治疗[d]的常用药是哪些厂商生产的？"], "gql": "MATCH (d:Disease{name:'[d]'})-[:common_drug]->(g:Drug)<-[:drugs_of]-(p:Producer) RETURN DISTINCT p.name"}
+{"type": 3, "nl": ["[d]的并发症都有哪些症状？", "[d]的并发症会表现出什么症状？"], "gql": "MATCH (d:Disease{name:'[d]'})-[:acompany_with]->(x:Disease)-[:has_symptom]->(s:Symptom) RETURN DISTINCT s.name"}
+{"type": 3, "nl": ["[d]所属科室的上级科室是什么？", "[d]就诊的科室归属于哪个大科室？"], "gql": "MATCH (d:Disease{name:'[d]'})-[:belongs_to]->(k:Department)-[:belongs_to]->(k2:Department) RETURN k2.name"}
+{"type": 4, "nl": ["[d]的治愈率是否高于[m]%？", "[d]的治愈率超过百分之[m]吗？"], "gql": "MATCH (d:Disease{name:'[d]'}) RETURN d.cured_prob_pct > [m]", "m": [30, 50, 60, 70, 80, 90]}
+{"type": 4, "nl": ["[d]的治疗周期是否超过[m]天？", "[d]需要治疗的天数会超过[m]天吗？"], "gql": "MATCH (d:Disease{name:'[d]'}) RETURN d.cure_days > [m]", "m": [7, 14, 30, 60, 90, 180]}
+{"type": 4, "nl": ["治疗[d]的最低费用是否低于[m]元？", "[d]的治疗费用下限少于[m]元吗？"], "gql": "MATCH (d:Disease{name:'[d]'}) RETURN d.cost_min < [m]", "m": [500, 1000, 3000, 5000, 10000]}
+{"type": 4, "nl": ["[d]是否有[s]这个症状？", "[s]是[d]的症状吗？"], "gql": "MATCH (d:Disease{name:'[d]'}) OPTIONAL MATCH (d)-[:has_symptom]->(s:Symptom{name:'[s]'}) RETURN count(s) > 0"}
+{"type": 4, "nl": ["[d]需要做[c]吗？", "诊断[d]是否需要做[c]检查？"], "gql": "MATCH (d:Disease{name:'[d]'}) OPTIONAL MATCH (d)-[:need_check]->(c:Check{name:'[c]'}) RETURN count(c) > 0"}
+{"type": 4, "nl": ["[g]是[d]的常用药吗？", "治疗[d]是否常用[g]？"], "gql": "MATCH (d:Disease{name:'[d]'}) OPTIONAL MATCH (d)-[:common_drug]->(g:Drug{name:'[g]'}) RETURN count(g) > 0"}
+{"type": 4, "nl": ["[d1]是[d2]的并发症吗？", "[d2]会并发[d1]吗？"], "gql": "MATCH (d2:Disease{name:'[d2]'}) OPTIONAL MATCH (d2)-[:acompany_with]->(d1:Disease{name:'[d1]'}) RETURN count(d1) > 0"}
+{"type": 4, "nl": ["[d1]的治愈率是否高于[d2]？", "[d1]比[d2]更容易治愈（治愈率更高）吗？"], "gql": "MATCH (a:Disease{name:'[d1]'}), (b:Disease{name:'[d2]'}) RETURN a.cured_prob_pct > b.cured_prob_pct"}
+{"type": 5, "nl": ["同时有[s1]和[s2]症状的疾病有哪些？", "哪些疾病既有[s1]又有[s2]的表现？"], "gql": "MATCH (s1:Symptom{name:'[s1]'})<-[:has_symptom]-(d:Disease)-[:has_symptom]->(s2:Symptom{name:'[s2]'}) RETURN d.name"}
+{"type": 5, "nl": ["既需要做[c1]又需要做[c2]的疾病有哪些？", "哪些疾病同时要做[c1]和[c2]检查？"], "gql": "MATCH (c1:Check{name:'[c1]'})<-[:need_check]-(d:Disease)-[:need_check]->(c2:Check{name:'[c2]'}) RETURN d.name"}
+{"type": 5, "nl": ["[d1]和[d2]有哪些共同的症状？", "[d1]与[d2]都会出现的症状是什么？"], "gql": "MATCH (d1:Disease{name:'[d1]'})-[:has_symptom]->(s:Symptom)<-[:has_symptom]-(d2:Disease{name:'[d2]'}) RETURN s.name"}
+{"type": 5, "nl": ["[d1]和[d2]都需要做的检查有哪些？", "诊断[d1]和[d2]时共同需要的检查是什么？"], "gql": "MATCH (d1:Disease{name:'[d1]'})-[:need_check]->(c:Check)<-[:need_check]-(d2:Disease{name:'[d2]'}) RETURN c.name"}
+{"type": 5, "nl": ["[d1]和[d2]共同的常用药品有哪些？", "哪些药品既是[d1]又是[d2]的常用药？"], "gql": "MATCH (d1:Disease{name:'[d1]'})-[:common_drug]->(g:Drug)<-[:common_drug]-(d2:Disease{name:'[d2]'}) RETURN g.name"}
+{"type": 5, "nl": ["[d1]和[d2]都忌吃的食物有哪些？", "哪些食物是[d1]和[d2]患者都不能吃的？"], "gql": "MATCH (d1:Disease{name:'[d1]'})-[:no_eat]->(f:Food)<-[:no_eat]-(d2:Disease{name:'[d2]'}) RETURN f.name"}
+{"type": 5, "nl": ["有[s]症状并且需要做[c]的疾病有哪些？", "哪些疾病既出现[s]又需要做[c]检查？"], "gql": "MATCH (s:Symptom{name:'[s]'})<-[:has_symptom]-(d:Disease)-[:need_check]->(c:Check{name:'[c]'}) RETURN d.name"}
+{"type": 5, "nl": ["同时生产[g1]和[g2]的厂家有哪些？", "哪些厂商既生产[g1]也生产[g2]？"], "gql": "MATCH (g1:Drug{name:'[g1]'})<-[:drugs_of]-(p:Producer)-[:drugs_of]->(g2:Drug{name:'[g2]'}) RETURN p.name"}
+{"type": 6, "nl": ["[d1]和[d2]的治愈率相差多少？", "[d1]与[d2]的治愈率差值是多少个百分点？"], "gql": "MATCH (a:Disease{name:'[d1]'}) WITH a.cured_prob_pct AS t1 MATCH (b:Disease{name:'[d2]'}) RETURN abs(b.cured_prob_pct - t1) AS abs_diff"}
+{"type": 6, "nl": ["[d1]和[d2]的治疗周期相差多少天？", "[d1]与[d2]的治疗天数差多少？"], "gql": "MATCH (a:Disease{name:'[d1]'}) WITH a.cure_days AS t1 MATCH (b:Disease{name:'[d2]'}) RETURN abs(b.cure_days - t1) AS abs_diff"}
+{"type": 6, "nl": ["[k]疾病的平均治愈率是多少？", "在[k]就诊的疾病，治愈率平均是多少？"], "gql": "MATCH (d:Disease)-[:belongs_to]->(k:Department{name:'[k]'}) RETURN avg(d.cured_prob_pct)"}
+{"type": 6, "nl": ["[k]下有多少种疾病？", "属于[k]的疾病一共有几种？"], "gql": "MATCH (d:Disease)-[:belongs_to]->(k:Department{name:'[k]'}) RETURN count(d)"}
+{"type": 6, "nl": ["[d]有多少个症状？", "[d]的症状一共有几个？"], "gql": "MATCH (d:Disease{name:'[d]'})-[:has_symptom]->(s:Symptom) RETURN count(s)"}
+{"type": 6, "nl": ["有[s]症状的疾病平均治愈率是多少？", "出现[s]的各种疾病，治愈率的平均值是多少？"], "gql": "MATCH (d:Disease)-[:has_symptom]->(s:Symptom{name:'[s]'}) RETURN avg(d.cured_prob_pct)"}
+{"type": 6, "nl": ["[g]是多少种疾病的常用药？", "有几种疾病常用[g]？"], "gql": "MATCH (d:Disease)-[:common_drug]->(g:Drug{name:'[g]'}) RETURN count(d)"}
+{"type": 6, "nl": ["[d]的最高与最低治疗费用相差多少元？", "治疗[d]的费用上限比下限多多少元？"], "gql": "MATCH (d:Disease{name:'[d]'}) RETURN d.cost_max - d.cost_min"}
+{"type": 7, "nl": ["[d]排名前[m]的推荐药品是哪些？", "[d]的好评药品中排在前[m]位的是什么？"], "gql": "MATCH (d:Disease{name:'[d]'})-[r:recommand_drug]->(g:Drug) WHERE r.rank <= [m] RETURN g.name", "m": [2, 3, 5]}
+{"type": 7, "nl": ["[d]的症状列表中排在首位的是什么？", "[d]列在第一位的症状是什么？"], "gql": "MATCH (d:Disease{name:'[d]'})-[r:has_symptom]->(s:Symptom) WHERE r.rank = 1 RETURN s.name"}
+{"type": 7, "nl": ["[d]需要做的前[m]项检查是什么？", "[d]的检查项目中排名前[m]的有哪些？"], "gql": "MATCH (d:Disease{name:'[d]'})-[r:need_check]->(c:Check) WHERE r.rank <= [m] RETURN c.name", "m": [2, 3]}
+{"type": 7, "nl": ["[g]在哪些疾病的推荐药品中排第一？", "哪些疾病把[g]列为排名第一的好评药品？"], "gql": "MATCH (d:Disease)-[r:recommand_drug]->(g:Drug{name:'[g]'}) WHERE r.rank = 1 RETURN d.name"}
+{"type": 7, "nl": ["[g]在[d]的推荐药品中排第几位？", "在[d]的好评药品列表里，[g]的排名是多少？"], "gql": "MATCH (d:Disease{name:'[d]'})-[r:recommand_drug]->(g:Drug{name:'[g]'}) RETURN r.rank"}
+{"type": 7, "nl": ["[d]的推荐药品中排名大于[m]的有多少个？", "[d]的好评药品里，排名在第[m]位之后的有几个？"], "gql": "MATCH (d:Disease{name:'[d]'})-[r:recommand_drug]->(g:Drug) WHERE r.rank > [m] RETURN count(g)", "m": [2, 3, 5]}
+{"type": 7, "nl": ["[d]和[g]之间是什么关系？", "[g]与[d]有什么关联（关系名称）？"], "gql": "MATCH (d:Disease{name:'[d]'})-[r]->(g:Drug{name:'[g]'}) RETURN r.name"}
+{"type": 7, "nl": ["[d]的第[m]个并发症是什么？", "[d]并发症列表中排第[m]位的是哪个？"], "gql": "MATCH (d:Disease{name:'[d]'})-[r:acompany_with]->(x:Disease) WHERE r.rank = [m] RETURN x.name", "m": [1, 2, 3]}
+{"type": 8, "nl": ["名称中含有\u201c[str]\u201d的疾病有哪些？", "哪些疾病的名字里带\u201c[str]\u201d？"], "gql": "MATCH (d:Disease) WHERE d.name CONTAINS '[str]' RETURN d.name", "str": ["综合征", "结石", "囊肿", "脓肿", "中毒", "骨折", "白血病", "肝炎", "皮炎", "脱位", "畸形", "损伤"]}
+{"type": 8, "nl": ["名称中包含\u201c[str]\u201d的症状有哪些？", "哪些症状的名字里有\u201c[str]\u201d？"], "gql": "MATCH (s:Symptom) WHERE s.name CONTAINS '[str]' RETURN s.name", "str": ["麻木", "瘙痒", "抽搐", "耳鸣", "呕血", "水肿", "心悸", "盗汗", "黄疸", "便秘"]}
+{"type": 8, "nl": ["[d]的症状中名称含有\u201c[str]\u201d的是哪些？", "[d]有哪些带\u201c[str]\u201d字的症状？"], "gql": "MATCH (d:Disease{name:'[d]'})-[:has_symptom]->(s:Symptom) WHERE s.name CONTAINS '[str]' RETURN s.name", "str": ["痛", "肿", "热", "出血", "咳", "红", "乏力", "呕吐"]}
+{"type": 8, "nl": ["[k]中病因提到\u201c[str]\u201d的疾病有哪些？", "在[k]就诊的疾病里，哪些疾病的病因涉及\u201c[str]\u201d？"], "gql": "MATCH (d:Disease)-[:belongs_to]->(k:Department{name:'[k]'}) WHERE d.cause CONTAINS '[str]' RETURN d.name", "str": ["病毒", "细菌", "遗传", "外伤", "真菌", "寄生虫", "吸烟"]}
+{"type": 8, "nl": ["传播方式包含\u201c[str]\u201d的疾病有哪些？", "哪些疾病通过\u201c[str]\u201d方式传播？"], "gql": "MATCH (d:Disease) WHERE d.get_way CONTAINS '[str]' RETURN d.name", "str": ["呼吸道", "虫媒", "母婴", "血液", "性传播", "消化道", "粪口", "飞沫"]}
+{"type": 8, "nl": ["名称以\u201c[str]\u201d开头的疾病有哪些？", "哪些疾病的名字以\u201c[str]\u201d开头？"], "gql": "MATCH (d:Disease) WHERE d.name STARTS WITH '[str]' RETURN d.name", "str": ["小儿", "先天性", "老年", "新生儿", "妊娠", "外伤性", "药物性", "原发性"]}
+{"type": 8, "nl": ["[d]的常用药中名称含\u201c[str]\u201d的是哪些？", "[d]有哪些常用药的名字带\u201c[str]\u201d？"], "gql": "MATCH (d:Disease{name:'[d]'})-[:common_drug]->(g:Drug) WHERE g.name CONTAINS '[str]' RETURN g.name", "str": ["片", "胶囊", "颗粒", "注射液", "丸", "口服液"]}
+{"type": 8, "nl": ["名称含\u201c[str]\u201d的疾病的治愈率分别是多少？", "名字里带\u201c[str]\u201d的疾病及其治愈率有哪些？"], "gql": "MATCH (d:Disease) WHERE d.name CONTAINS '[str]' RETURN d.name, d.cured_prob", "str": ["白血病", "结石", "中毒", "脓肿", "脱位", "肝炎"]}
