@@ -40,3 +40,6 @@ templates (`seeds_vi.jsonl`) are Vietnamese, and string filters compare lowercas
 table `data/names_vi.tsv` (kind, Chinese, Vietnamese; 33,250 rows, machine-translated) is derived from `medical.json`,
 so it is not in this repository and is shared privately. Long texts (`description`, `cause`, `prevent`) and producer
 names stay in Chinese. Without `NL2GQL_LANG` the code behaves exactly as tag `v1`.
+
+Tag `v3` (12 October 2026): with `NL2GQL_LANG=vi` the label linker matches entity names regardless of case, since
+Vietnamese names are capitalised in the graph but often written in lower case in questions. Chinese results are unchanged.

@@ -10,7 +10,7 @@ import json
 import math
 import re
 
-from common import run
+from common import LANG, run
 from schema import NODES, EDGES, EDGE_TRIGGERS, PROP_TRIGGERS, LABEL_TRIGGERS, render_schema
 
 # ============================================================== EM
@@ -146,6 +146,11 @@ class SchemaExtractor:
 
     def __init__(self, name2labels, train_items):
         self.n2l = name2labels
+        if LANG == 'vi':  # Vietnamese names are capitalised; match them in the question regardless of case
+            low = collections.defaultdict(set)
+            for n, labs in name2labels.items():
+                low[n.lower()] |= set(labs)
+            self.n2l = low
         self.maxlen = max(len(n) for n in name2labels)
         self.train = [(_bigrams(x['nl']), gold_items(x['gql'])[0]) for x in train_items]
         idf = collections.Counter()
@@ -173,6 +178,8 @@ class SchemaExtractor:
         return [labs for _, labs in sims[:k]]
 
     def link_entities(self, nl):
+        if LANG == 'vi':
+            nl = nl.lower()
         found, i = [], 0
         while i < len(nl):
             hit = None
