@@ -8,6 +8,7 @@ import random
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))).replace(chr(92), '/')
 WORK = ROOT + '/work'
+LANG = os.environ.get('NL2GQL_LANG', 'zh')   # zh = DiseaseKG as in the paper; vi = Vietnamese names (data/names_vi.tsv)
 SEED = 20261010
 TYPE_NAME = {1: 'Entity property', 2: 'Numerical sorting', 3: 'Relationship inference', 4: 'Yes/No question',
              5: 'Relationship filtering', 6: 'Attribute comparison', 7: 'Edge property', 8: 'String filtering'}

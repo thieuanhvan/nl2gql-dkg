@@ -30,3 +30,13 @@ The step-by-step guide (Vietnamese) downloads each file of `code/` when its step
 
 Run every script from the folder that contains `code/`, for example `python code/build_kg.py`. Neo4j connection:
 `NEO4J_URI` (default `bolt://localhost:7687`), `NEO4J_DB` (default `diseasekg`), `NEO4J_USER`, `NEO4J_PASSWORD`.
+
+## Vietnamese version (tag `v2`)
+
+Set `NL2GQL_LANG=vi` to run the same pipeline in Vietnamese: entity names and short Disease properties are replaced by
+their Vietnamese translations when the graph is built, the schema explanations, ChatGPT prompts and the 64 seed
+templates (`seeds_vi.jsonl`) are Vietnamese, and string filters compare lowercase text
+(`lower(s.name) CONTAINS 'vàng da'`). Labels, relationship types and property names stay in English. The translation
+table `data/names_vi.tsv` (kind, Chinese, Vietnamese; 33,250 rows, machine-translated) is derived from `medical.json`,
+so it is not in this repository and is shared privately. Long texts (`description`, `cause`, `prevent`) and producer
+names stay in Chinese. Without `NL2GQL_LANG` the code behaves exactly as tag `v1`.

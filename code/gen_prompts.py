@@ -7,7 +7,7 @@ import argparse
 import json
 import os
 
-from common import ROOT, work, read_jsonl, write_jsonl, rng_for, TYPE_NAME
+from common import ROOT, LANG, work, read_jsonl, write_jsonl, rng_for, TYPE_NAME
 from schema import render_schema
 from templates import TYPE_DESC, SLOT_RULES
 
@@ -20,7 +20,7 @@ a = ap.parse_args()
 pool_file = work('gpt', 'pool.jsonl')
 pool = read_jsonl(pool_file)
 if not pool:
-    for i, s in enumerate(read_jsonl(ROOT + '/code/seeds.jsonl')):
+    for i, s in enumerate(read_jsonl(ROOT + ('/code/seeds_vi.jsonl' if LANG == 'vi' else '/code/seeds.jsonl'))):
         kw = {k: s[k] for k in ('m', 'str') if k in s}
         pool.append(dict(tid=f'S{s["type"]}_{i:03d}', type=s['type'], round=0, source='seed', nl=s['nl'], gql=s['gql'], kw=kw))
     write_jsonl(pool_file, pool)
@@ -36,7 +36,23 @@ for t in sorted(TYPE_DESC):
         obj = {'nl': d['nl'], 'gql': d['gql']}
         obj.update({k: v for k, v in d.get('kw', {}).items() if v})
         lines.append(json.dumps(obj, ensure_ascii=False))
-    prompt = (
+    if LANG == 'vi':
+        prompt = (
+            'Bạn là chuyên gia truy vấn CSDL đồ thị. Dưới đây là schema của một đồ thị tri thức về bệnh (CSDL Neo4j, truy vấn bằng '
+            'Cypher); mỗi trường có kèm giải thích tiếng Việt.\n\n'
+            f'[Schema]\n{schema}\n\n'
+            f'[Loại câu hỏi {t}: {TYPE_NAME[t]}]\n{TYPE_DESC[t]}\n\n'
+            f'[Quy ước chỗ trống]\n{SLOT_RULES}\n\n'
+            '[Ví dụ] (mỗi dòng một đối tượng JSON)\n' + '\n'.join(lines) + '\n\n'
+            f'[Nhiệm vụ]\nTheo các ví dụ, viết thêm {a.new} cặp template NL-GQL mới cho cùng loại câu hỏi, khác nhau và không trùng ví dụ. Yêu cầu:\n'
+            '1. GQL viết bằng Cypher, chỉ dùng nhãn, quan hệ và thuộc tính có trong schema ở trên; truy vấn phải chạy được trên CSDL.\n'
+            '2. Mỗi template cho 1 đến 2 cách hỏi tự nhiên bằng tiếng Việt, đặt trong danh sách "nl".\n'
+            '3. Nếu dùng [m] thì cho 2 đến 4 con số phù hợp trong "m"; nếu dùng [str] thì cho 2 đến 4 chuỗi con phù hợp '
+            '(bằng tiếng Việt, đúng như tên trong CSDL) trong "str".\n'
+            '4. Chỉ xuất JSON, mỗi dòng một đối tượng, không đánh số, không giải thích. Định dạng:\n'
+            '{"nl": ["cách hỏi 1", "cách hỏi 2"], "gql": "MATCH ...", "m": [3, 5]}\n')
+    else:
+        prompt = (
         '你是图数据库查询专家。下面是一个疾病知识图谱（Neo4j 数据库，用 Cypher 查询）的 schema，每个字段后面附有中文解释。\n\n'
         f'[Schema]\n{schema}\n\n'
         f'[问题类型 {t}：{TYPE_NAME[t]}]\n{TYPE_DESC[t]}\n\n'

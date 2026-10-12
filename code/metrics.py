@@ -217,15 +217,15 @@ class SchemaExtractor:
                 cands = pick or cands
             labels.update(cands)
         for r, trig in EDGE_TRIGGERS.items():
-            if any(t in nl for t in trig):
+            if any(t in nl.lower() for t in trig):
                 for e in EDGE_KEYS:
                     if e[0] == r:
                         edges.add(e); labels.update([e[1], e[2]])
         for lab, trig in LABEL_TRIGGERS.items():
-            if any(t in nl for t in trig):
+            if any(t in nl.lower() for t in trig):
                 labels.add(lab)
         for p, trig in PROP_TRIGGERS.items():
-            if any(t in nl for t in trig) and p != 'rank':
+            if any(t in nl.lower() for t in trig) and p != 'rank':
                 labels.add('Disease')
         if not labels:
             labels.add('Disease')

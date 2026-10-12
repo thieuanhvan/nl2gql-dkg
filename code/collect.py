@@ -9,7 +9,7 @@ import collections
 import os
 import re
 
-from common import work, read_jsonl, write_jsonl
+from common import LANG, work, read_jsonl, write_jsonl
 from schema import render_schema
 from templates import TYPE_DESC, parse_json_lines, schema_problems, explain_template
 
@@ -62,6 +62,19 @@ for k in range(0, len(ok), a.batch):
     n_parts += 1
     items = '\n'.join('{"id": "%s", "gql": "%s"}' % (c['tid'], c['gql'].replace('\\', '\\\\').replace('"', '\\"'))
                       for c in ok[k:k + a.batch])
+    if LANG == 'vi':
+        prompt = ('Bạn là chuyên gia truy vấn CSDL đồ thị. Dưới đây là schema của một đồ thị tri thức về bệnh (Neo4j, Cypher); '
+                  'mỗi trường có kèm giải thích tiếng Việt.\n\n'
+                  f'[Schema]\n{schema}\n\n'
+                  'Mỗi dòng dưới đây là một template truy vấn Cypher; chỗ trống trong ngoặc vuông như [d], [s], [m] là thực thể '
+                  'hay con số sẽ điền sau.\n'
+                  'Với mỗi truy vấn: trước hết giải thích từng mệnh đề (MATCH, WHERE, WITH, RETURN, ORDER BY, LIMIT) đang làm gì, '
+                  'rồi dựa vào lời giải thích đó viết một câu hỏi tiếng Việt mà truy vấn trả lời, giữ nguyên các chỗ trống.\n\n'
+                  f'[Truy vấn]\n{items}\n\n'
+                  'Chỉ xuất JSON, mỗi dòng một đối tượng, theo đúng thứ tự đầu vào, không đánh số. Định dạng:\n'
+                  '{"id": "G1_1_00", "cot": "giải thích từng bước", "nl": "câu hỏi viết lại"}\n')
+        open(work('gpt', 'prompts', f'cot_round{a.round}_part{n_parts}.txt'), 'w', encoding='utf-8').write(prompt)
+        continue
     prompt = ('你是图数据库查询专家。下面是一个疾病知识图谱（Neo4j，Cypher）的 schema，每个字段后附有中文解释。\n\n'
               f'[Schema]\n{schema}\n\n'
               '下面每行是一个 Cypher 查询模板，方括号槽位如 [d]、[s]、[m] 表示待填的实体或数值。\n'

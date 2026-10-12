@@ -7,13 +7,16 @@
 #   Disease numbers parsed from text: get_prob_pct, cured_prob_pct, cure_days, cost_min, cost_max
 #   relationship property rank = position (1, 2, ...) of the item in the source list
 # Field 'desc' is renamed 'description' because DESC is a Cypher keyword. Empty text becomes "no value" (null).
+# Vietnamese graph (NL2GQL_LANG=vi): names of Disease, Symptom, Drug, Food, Check, Department, the short Disease texts and the
+# relationship labels are replaced by data/names_vi.tsv (machine translation shared inside the group, not public);
+# Producer names and long texts (description, cause, prevent) stay Chinese. Same structure and counts as the Chinese graph.
 # Usage: python code/build_kg.py      (writes work/logs/kg_stats.json)
 import json
 import re
 import sys
 import time
 
-from common import ROOT, work, session
+from common import ROOT, LANG, work, session
 
 SRC = ROOT + '/data/medical.json'
 
@@ -121,6 +124,31 @@ for k in rels:                                                                  
             out.append((s, d, rk))
     rels[k] = out
 rels['belongs_to_pp'] = [t for t in rels['belongs_to_pp'] if t[0] != t[1]]
+
+# ---------------------------------------------------------------- Vietnamese names (NL2GQL_LANG=vi)
+if LANG == 'vi':
+    from schema import REL_LABEL_VI
+    tr = {}
+    for line in open(ROOT + '/data/names_vi.tsv', encoding='utf-8'):
+        if line.startswith('#') or not line.strip():
+            continue
+        kind, zh, vi = line.rstrip('\n').split('\t')
+        tr.setdefault(kind, {})[zh] = vi
+    N = lambda lab, x: tr.get(lab, {}).get(x, x)
+    SHORT = ['category', 'easy_get', 'get_way', 'yibao_status', 'get_prob', 'cured_prob', 'cure_lasttime', 'cost_money',
+             'cure_way', 'cure_department']
+    new = {}
+    for d in disease.values():
+        d = dict(d, name=N('Disease', d['name']))
+        for c in SHORT:
+            if d[c]:
+                d[c] = tr.get('prop:' + c, {}).get(d[c].replace('\t', ' ').replace('\n', ' '), d[c])
+        new[d['name']] = d
+    disease = new
+    pools = {lab: ({N(lab, x) for x in v} if lab != 'Producer' else v) for lab, v in pools.items()}
+    rels = {k: [(N(a, s_), N(b, d_), rk) for s_, d_, rk in v] for k, v in rels.items() for a, b in [ENDS[k]]}
+    CN = {k: REL_LABEL_VI.get(v, v) for k, v in CN.items()}
+    print('Vietnamese names:', sum(len(v) for v in tr.values()), 'translations loaded')
 
 # ---------------------------------------------------------------- load into Neo4j
 t0 = time.time()

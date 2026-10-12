@@ -3,6 +3,7 @@
 # Slot convention: an entity appears in the GQL only as (var:Label{name:'[slot]'}); [m] is a number, [str] a substring.
 import collections
 import json
+import os
 import re
 
 from common import run, explain_ok
@@ -23,6 +24,22 @@ SLOT_RULES = ("槽位约定：实体只能以 (变量:标签{name:'[槽位]'}) �
               "[d] [d1] [d2] 表示疾病，[s] [s1] [s2] 症状，[c] [c1] [c2] 检查项目，[g] [g1] [g2] 药品，"
               "[f] [f1] [f2] 食物，[k] 科室，[p] 生产厂商，[m] 数字，[str] 子字符串。"
               "自然语言问题中必须出现与 GQL 完全相同的槽位，不能多也不能少。")
+TYPE_DESC_VI = {
+    1: 'Thuộc tính thực thể: hỏi một hay nhiều thuộc tính của một thực thể, ví dụ “Nguyên nhân của [d] là gì?”',
+    2: 'Sắp xếp số: sắp theo thuộc tính số hoặc số lượng rồi lấy vài kết quả đầu, ví dụ “[m] bệnh có tỉ lệ chữa khỏi cao nhất thuộc [k] là những bệnh nào?”',
+    3: 'Suy luận quan hệ: đi theo một hay nhiều quan hệ để tìm thực thể liên quan, ví dụ “Các bệnh có triệu chứng [s] thường dùng thuốc gì?”',
+    4: 'Câu hỏi có/không: trả lời có hoặc không, ví dụ “Tỉ lệ chữa khỏi của [d] có cao hơn [m]% không?”',
+    5: 'Lọc theo quan hệ: thực thể thoả cùng lúc hai điều kiện quan hệ, ví dụ “Những bệnh nào vừa cần xét nghiệm [c] vừa phải kiêng ăn [f]?”',
+    6: 'So sánh thuộc tính: so sánh hoặc tính chênh lệch thuộc tính của hai thực thể, ví dụ “Chi phí điều trị cao nhất của [d1] và [d2] chênh nhau bao nhiêu tệ?”',
+    7: 'Thuộc tính cạnh: dùng thuộc tính trên quan hệ (rank, vị trí trong danh sách gốc) để lọc hoặc trả về, ví dụ “Triệu chứng đứng đầu của [d] là gì?”',
+    8: 'Lọc chuỗi: tên hoặc văn bản chứa, bắt đầu hay kết thúc bằng một chuỗi, ví dụ “Những thực phẩm nào có tên chứa [str]?”',
+}
+SLOT_RULES_VI = ("Quy ước chỗ trống: thực thể chỉ được xuất hiện trong GQL dưới dạng (biến:Nhãn{name:'[chỗ trống]'}). "
+                 "[d] [d1] [d2] là bệnh, [s] [s1] [s2] triệu chứng, [c] [c1] [c2] xét nghiệm, [g] [g1] [g2] thuốc, "
+                 "[f] [f1] [f2] thực phẩm, [k] khoa, [p] hãng sản xuất, [m] một con số, [str] một chuỗi con. "
+                 "Câu hỏi tiếng Việt phải có đúng các chỗ trống như trong GQL, không thừa không thiếu.")
+if os.environ.get('NL2GQL_LANG', 'zh') == 'vi':
+    TYPE_DESC, SLOT_RULES = TYPE_DESC_VI, SLOT_RULES_VI
 LABELS = set(NODES)
 EDGE_ENDS = {e[0]: set() for e in EDGES}
 for name, s, d, _, _ in EDGES:
