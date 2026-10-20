@@ -2,7 +2,7 @@
 
 Reproduction code for Liang et al., *Aligning Large Language Models to a Domain-specific Graph Database for NL2GQL*,
 CIKM 2024 ([arXiv:2402.16567](https://arxiv.org/abs/2402.16567)), on the medical knowledge graph DiseaseKG loaded into
-Neo4j. Course project of group 14, IS6002.CH191 (Advanced Database Systems).
+Neo4j. Course project of group 14, IS6002.26.1.CH.01 (Advanced Database Systems).
 
 This repository holds **code only**. It contains no data: DiseaseKG (`medical.json`) is downloaded from
 [liuhuanyong/QASystemOnMedicalKG](https://github.com/liuhuanyong/QASystemOnMedicalKG) in step 1, and every other file
@@ -27,6 +27,9 @@ The step-by-step guide (Vietnamese) downloads each file of `code/` when its step
 | 7 | `score.py` | EM and EX on Neo4j | paper Sec. 5.1 |
 | 8 | `door1_split.py`, `door1_decide.py` | template-disjoint split and pre-registered decision rule | group addition |
 | 9 | `chatgpt_sheet.py` | 50-question comparison with ChatGPT | course requirement |
+| 3, 9 | `gpt_api.py` | send prompt files to ChatGPT through the OpenAI API and save the replies (tag `v4`) | paper Sec. 4.1 (the paper calls ChatGPT through its API) |
+| 3-9 | `run_steps.py` | run a group of steps with the Neo4j password typed once (`data`, `score`, `chatgpt`, `synonym`) | group addition |
+| extension | `synonym_test.py`, `aliases_vi.tsv` | normalize everyday disease names before the label linker; 32 hand-written questions | group addition |
 
 Run every script from the folder that contains `code/`, for example `python code/build_kg.py`. Neo4j connection:
 `NEO4J_URI` (default `bolt://localhost:7687`), `NEO4J_DB` (default `diseasekg`), `NEO4J_USER`, `NEO4J_PASSWORD`.
@@ -43,3 +46,11 @@ names stay in Chinese. Without `NL2GQL_LANG` the code behaves exactly as tag `v1
 
 Tag `v3` (12 October 2026): with `NL2GQL_LANG=vi` the label linker matches entity names regardless of case, since
 Vietnamese names are capitalised in the graph but often written in lower case in questions. Chinese results are unchanged.
+
+Tag `v4` (20 October 2026): ChatGPT through the OpenAI API, as in the paper, instead of pasting prompts into ChatGPT web
+(the web route still works: save each reply where `gpt_api.py` would). The API key is read from `OPENAI_API_KEY` or
+`~/.openai/key.txt` and never printed; every call (model, tokens) is logged to `work/gpt/responses/chatgpt_log.txt`.
+`run_steps.py` checks that Neo4j answers before running, because a run started while the DBMS is still booting rejects
+every ChatGPT reply as invalid Cypher. `synonym_test.py` is the group's extension: with the label linker of the paper only
+4 of 32 questions written with everyday names (tiểu đường, cao huyết áp, ...) are linked to the right node and ChatGPT's
+queries return nothing; after replacing those names with node names, 30 of 32 are linked and all 32 queries are correct.
