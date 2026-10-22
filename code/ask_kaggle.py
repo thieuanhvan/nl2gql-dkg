@@ -80,15 +80,20 @@ def prompt(x):
 
 
 t1 = time.time()
+BS = 8                                                      # batch of questions per generate call, as in training
 with open(f'{OUT}/answers_{JOB}.txt', 'w', encoding='utf-8') as ft, \
         open(f'{OUT}/answers_{JOB}.jsonl', 'w', encoding='utf-8') as fj:
-    for x in QUESTIONS:
-        e = tok([prompt(x)], return_tensors='pt', add_special_tokens=False).to('cuda')
+    for i in range(0, len(QUESTIONS), BS):
+        batch = QUESTIONS[i:i + BS]
+        e = tok([prompt(x) for x in batch], return_tensors='pt', padding=True, add_special_tokens=False).to('cuda')
         with torch.inference_mode(), torch.autocast('cuda', dtype=dtype):
             o = model.generate(**e, max_new_tokens=200, do_sample=False, pad_token_id=tok.pad_token_id)
-        raw = tok.decode(o[0][e['input_ids'].shape[1]:], skip_special_tokens=True)
-        pred = clean(raw)
-        ft.write(f"{x['id']}: {pred}\n")
-        fj.write(json.dumps(dict(id=x['id'], nl=x['nl'], pred=pred, raw=raw), ensure_ascii=False) + '\n')
-        log(x['id'], x['nl'], '->', pred)
+        for x, r in zip(batch, o):
+            raw = tok.decode(r[e['input_ids'].shape[1]:], skip_special_tokens=True)
+            pred = clean(raw)
+            ft.write(f"{x['id']}: {pred}\n")
+            fj.write(json.dumps(dict(id=x['id'], nl=x['nl'], pred=pred, raw=raw), ensure_ascii=False) + '\n')
+            log(x['id'], x['nl'], '->', pred)
+        ft.flush()
+        fj.flush()
 log('done', len(QUESTIONS), 'questions in', round(time.time() - t1), 's')

@@ -34,9 +34,9 @@ GROUPS = {
     ],
     'chatgpt': [
         ('9a: 50-question sheet', [py, 'code/chatgpt_sheet.py']),
-        ('9b: ChatGPT answers via API', [py, 'code/gpt_api.py', '--prompt-file', 'work/chatgpt50/prompt_chatgpt.txt',
-                                         '--out-file', 'work/chatgpt50/answers_chatgpt.txt']),
-        ('9c: EM and EX of ChatGPT', [py, 'code/score.py', '--chatgpt', 'work/chatgpt50/answers_chatgpt.txt']),
+        ('9b: ChatGPT answers via API', [py, 'code/gpt_api.py', '--prompt-file', 'work/chatgpt_50questions/prompt_chatgpt.txt',
+                                         '--out-file', 'work/chatgpt_50questions/answers_chatgpt.txt']),
+        ('9c: EM and EX of ChatGPT', [py, 'code/score.py', '--chatgpt', 'work/chatgpt_50questions/answers_chatgpt.txt']),
     ],
     'synonym': [
         ('synonym test: entity linking', [py, 'code/synonym_test.py', 'link']),

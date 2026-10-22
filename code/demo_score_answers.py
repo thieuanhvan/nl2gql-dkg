@@ -1,9 +1,9 @@
 # demo_score_answers.py - score a small set of answers "Qxx: <Cypher>" against gold queries, showing EM and EX step
 # by step: the clause sets that EM compares and the result rows that EX compares. Default: the 8 Đái tháo đường
-# (diabetes) questions of demo_chatgpt_web_prompt.txt and the ChatGPT answers saved in work/chatgpt_web_demo/.
+# (diabetes) questions of demo/diabetes8_prompt.txt and the ChatGPT answers of demo/diabetes8_chatgpt_web.txt.
 # Output: work/scores/ask/<answers file name>_<YYYYMMDD_HHMM>.json (EM, EX total and per question).
 # Usage (from the folder that contains code/ and work/; needs the Neo4j password for EX):
-#   python code/demo_score_answers.py                                   ChatGPT API answers of 22/10
+#   python code/demo_score_answers.py                                   demo/diabetes8_chatgpt_web.txt (chatgpt.com answers)
 #   python code/demo_score_answers.py work/chatgpt_web_demo/my_answers.txt   any file with lines "Qxx: <Cypher>"
 import getpass
 import json
@@ -32,7 +32,7 @@ GOLD = {
                                        "-[:has_symptom]->(s:Symptom{name:'Uống nhiều'}) RETURN d.name"),
     'Q08': ('tiểu đường (tên thường gọi)', f"MATCH (d:Disease{{name:'{D}'}})-[:need_check]->(c:Check) RETURN c.name"),
 }
-path = sys.argv[1] if len(sys.argv) > 1 else 'work/chatgpt_web_demo/answers_api_diabetes_20261022.txt'
+path = sys.argv[1] if len(sys.argv) > 1 else 'demo/diabetes8_chatgpt_web.txt'
 ans = {}
 for line in open(path, encoding='utf-8'):
     m = re.match(r'\s*(Q\d+)\s*:\s*(.+)', line)

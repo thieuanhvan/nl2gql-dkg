@@ -4,7 +4,7 @@
 #   python code/gpt_api.py --round 1          every work/gpt/prompts/round1_type*.txt that has no reply yet
 #   python code/gpt_api.py --cot 1            every work/gpt/prompts/cot_round1_part*.txt that has no reply yet
 #   python code/gpt_api.py round1_type3       named prompts only
-#   python code/gpt_api.py --prompt-file work/chatgpt50/prompt_chatgpt.txt --out-file work/chatgpt50/answers_chatgpt.txt
+#   python code/gpt_api.py --prompt-file work/chatgpt_50questions/prompt_chatgpt.txt --out-file work/chatgpt_50questions/answers_chatgpt.txt
 # API key: environment variable OPENAI_API_KEY, or the file ~/.openai/key.txt (key only). The key is never printed.
 # Every call is logged (time, model, prompt, tokens) to work/gpt/responses/chatgpt_log.txt.
 import argparse

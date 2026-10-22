@@ -3,7 +3,7 @@
 #   python code/score.py --gold-sanity                          gold vs gold, must give EM 100 / EX 100
 #   python code/score.py --preds work/out/random/preds          one <job>.jsonl per configuration (Kaggle output)
 #   python code/score.py --split door1 --preds work/out/door1/preds
-#   python code/score.py --chatgpt work/chatgpt50/answers_chatgpt.txt     (step 9, lines "Qxx: <query>")
+#   python code/score.py --chatgpt work/chatgpt_50questions/answers_chatgpt.txt     (step 9, lines "Qxx: <query>")
 # Output: work/scores/<split>/scores_<YYYYMMDD_HHMM>.json and <job>_items.jsonl (score of every question).
 import argparse
 import collections
@@ -58,7 +58,7 @@ if a.preds:
         table[name], rows = score(preds, gold)
         write_jsonl(f'{outdir}/{name}_items.jsonl', rows)
 if a.chatgpt:
-    qs = read_jsonl(work('chatgpt50', 'questions_50.jsonl'))
+    qs = read_jsonl(work('chatgpt_50questions', 'questions_50.jsonl'))
     qmap = {q['q']: q['id'] for q in qs}
     preds, cur = {}, None
     for line in open(a.chatgpt, encoding='utf-8').read().replace('```cypher', '').replace('```', '').splitlines():
