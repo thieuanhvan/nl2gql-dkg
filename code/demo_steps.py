@@ -58,7 +58,8 @@ else:
     cand = next((x for x in rd(f'{W}/gpt/candidates/round{rnd}.jsonl') if x['tid'] == tid), None)
     head(f'BƯỚC 3c  kiểm định dạng, tên schema, cú pháp Neo4j (work/gpt/candidates/round{rnd}.jsonl)')
     allc = rd(f'{W}/gpt/candidates/round{rnd}.jsonl')
-    print(f'  vòng {rnd}: {sum(not x["problems"] for x in allc)}/{len(allc)} cặp qua kiểm')
+    inpool = sum(1 for x in rd(f'{W}/gpt/pool.jsonl') if x.get('source') == 'chatgpt' and x.get('round') == rnd)
+    print(f'  vòng {rnd}: ChatGPT đề xuất {len(allc)} cặp; vào kho (work/gpt/pool.jsonl) {inpool} template')
     print('  cặp này:', 'QUA' if cand and not cand['problems'] else f'LOẠI {cand["problems"] if cand else "?"}')
     cot = next((x for x in rd(f'{W}/gpt/candidates/cot_round{rnd}.jsonl') if x['tid'] == tid), None)
     if cot:
