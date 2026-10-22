@@ -34,7 +34,7 @@ The step-by-step guide (Vietnamese) downloads each file of `code/` when its step
 | 7 | `demo_emex.py` | live demo: record counts, then EM and EX of three test questions (right on both; wrong on EM, right on EX; wrong on both), `--all` re-scores the 296 questions | group addition |
 | 8 | `door1_split.py`, `door1_decide.py` | template-disjoint split and pre-registered decision rule | group addition |
 | 9 | `chatgpt_sheet.py` | 50-question comparison with ChatGPT (`work/chatgpt_50questions/`) | course requirement |
-| 3, 9 | `gpt_api.py` | send prompt files to ChatGPT through the OpenAI API and save the replies (tag `v4`) | paper Sec. 4.1 (the paper calls ChatGPT through its API) |
+| 3, 9 | `gpt_api.py` | send prompt files to ChatGPT through the OpenAI API and save the replies (tag `v4`) | paper Sec. 4.1 (the paper uses ChatGPT-3.5 and does not say how it was called; the group uses gpt-4o through the API) |
 | 3-9 | `run_steps.py` | run a group of steps with the Neo4j password typed once (`data`, `score`, `chatgpt`, `synonym`) | group addition |
 | extension | `synonym_test.py`, `aliases_vi.tsv` | normalize everyday disease names before the label linker; 32 hand-written questions | group addition |
 
