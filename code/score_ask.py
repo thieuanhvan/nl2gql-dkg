@@ -23,6 +23,7 @@ os.environ.setdefault('NL2GQL_LANG', 'vi')
 if not os.environ.get('NEO4J_PASSWORD'):
     os.environ['NEO4J_PASSWORD'] = getpass.getpass('Neo4j DBMS password (not echoed): ')
 sys.path.insert(0, 'code')
+from common import run  # noqa: E402
 from metrics import exact_match, exec_match, gold_rows  # noqa: E402
 
 gold = [json.loads(x) for x in open(a.gold, encoding='utf-8')]
@@ -32,6 +33,11 @@ for line in text.splitlines():
     m = re.match(r'\s*\**\s*([A-Z]\d+)\s*\**\s*:\s*(.+)', line)
     if m:
         ans[m.group(1)] = m.group(2).strip()
+try:                                                          # wrong password or Neo4j not started: say so plainly
+    run('RETURN 1')
+except Exception as e:
+    sys.exit(f'DỪNG: không nối được Neo4j ({str(e).splitlines()[0][:120]}). Kiểm Neo4j Desktop đã Start, '
+             'CSDL diseasekg-vi, và gõ đúng mật khẩu.')
 if not gold_rows(gold[0]['gql']):                             # every gold query returned rows when it was built
     sys.exit(f"DỪNG: câu đúng {gold[0]['id']} ra 0 dòng. Kiểm CSDL đang nối (NEO4J_DB={os.environ.get('NEO4J_DB', 'mặc định')}), "
              "phải là diseasekg-vi và Neo4j đã Start.")

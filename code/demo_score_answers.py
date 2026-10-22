@@ -48,6 +48,11 @@ def rows(q):
         return f'lỗi: {str(e).splitlines()[0][:100]}'
 
 
+try:                                                          # wrong password or Neo4j not started: say so plainly
+    run('RETURN 1')
+except Exception as e:
+    sys.exit(f'DỪNG: không nối được Neo4j ({str(e).splitlines()[0][:120]}). Kiểm Neo4j Desktop đã Start, '
+             'CSDL diseasekg-vi, và gõ đúng mật khẩu.')
 em_n = ex_n = 0
 items = []
 for q, (topic, gold) in GOLD.items():
