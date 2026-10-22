@@ -26,6 +26,8 @@ The step-by-step guide (Vietnamese) downloads each file of `code/` when its step
 | 5-6 | `kaggle_pack.py`, `train_kaggle.py` | private Kaggle dataset and GPU kernel (QLoRA Qwen2.5-7B, ICL baseline) | paper Sec. 4.2 and 5 |
 | 7 | `score.py` | EM and EX on Neo4j | paper Sec. 5.1 |
 | 3-7 | `demo_steps.py` | follow one test question back through every intermediate file (ChatGPT reply, check, CoT similarity, grounded pairs, relevant schema, prediction, EM/EX); reads files only | group addition |
+| 7 | `demo_score_answers.py` | score a few answers "Qxx: <Cypher>" against gold queries (default: 8 Đái tháo đường questions), showing what EM and EX compare | group addition |
+| 6 | `ask_pack.py`, `ask_kaggle.py` | ask the fine-tuned model new questions on Kaggle: relevant schema built locally, kernel loads Qwen2.5-7B + adapter ft7_relcn from the nl2gql-dkg kernel output | group addition |
 | 7 | `demo_emex.py` | live demo: record counts, then EM and EX of three test questions (right on both; wrong on EM, right on EX; wrong on both), `--all` re-scores the 296 questions | group addition |
 | 8 | `door1_split.py`, `door1_decide.py` | template-disjoint split and pre-registered decision rule | group addition |
 | 9 | `chatgpt_sheet.py` | 50-question comparison with ChatGPT | course requirement |
