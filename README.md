@@ -28,14 +28,18 @@ The step-by-step guide (Vietnamese) downloads each file of `code/` when its step
 | 3-7 | `demo_steps.py` | follow one test question back through every intermediate file (ChatGPT reply, check, CoT similarity, grounded pairs, relevant schema, prediction, EM/EX); reads files only | group addition |
 | 7 | `demo_score_answers.py` | score a few answers "Qxx: <Cypher>" against gold queries (default: 8 Đái tháo đường questions), showing what EM and EX compare | group addition |
 | 6 | `ask_pack.py`, `ask_kaggle.py` | ask the fine-tuned model new questions on Kaggle: relevant schema built locally, kernel loads Qwen2.5-7B + adapter ft7_relcn from the nl2gql-dkg kernel output | group addition |
+| demo | `ask_build_diabetes.py` | many new Đái tháo đường (diabetes) questions with gold Cypher checked on Neo4j (from the pool templates, hand-written, everyday name "tiểu đường"), written to `demo/diabetes_all_gold.jsonl` | group addition |
+| demo | `ask_chatgpt.py` | ask ChatGPT the same questions through the OpenAI API with the step-9 prompt, 50 questions per call, to `demo/diabetes_all_chatgpt.txt` | group addition |
+| demo | `score_ask.py` | EM and EX of an answer file "<id>: <Cypher>" against `demo/diabetes_all_gold.jsonl`, totals per part and per question type | group addition |
 | 7 | `demo_emex.py` | live demo: record counts, then EM and EX of three test questions (right on both; wrong on EM, right on EX; wrong on both), `--all` re-scores the 296 questions | group addition |
 | 8 | `door1_split.py`, `door1_decide.py` | template-disjoint split and pre-registered decision rule | group addition |
-| 9 | `chatgpt_sheet.py` | 50-question comparison with ChatGPT | course requirement |
+| 9 | `chatgpt_sheet.py` | 50-question comparison with ChatGPT (`work/chatgpt_50questions/`) | course requirement |
 | 3, 9 | `gpt_api.py` | send prompt files to ChatGPT through the OpenAI API and save the replies (tag `v4`) | paper Sec. 4.1 (the paper calls ChatGPT through its API) |
 | 3-9 | `run_steps.py` | run a group of steps with the Neo4j password typed once (`data`, `score`, `chatgpt`, `synonym`) | group addition |
 | extension | `synonym_test.py`, `aliases_vi.tsv` | normalize everyday disease names before the label linker; 32 hand-written questions | group addition |
 
-Run every script from the folder that contains `code/`, for example `python code/build_kg.py`. Neo4j connection:
+Files opened by hand during the demo are in `demo/` (pairs share a prefix: `diabetes8_` for the 8 questions pasted into
+chatgpt.com, `diabetes_all_` for the larger set). Run every script from the folder that contains `code/`, for example `python code/build_kg.py`. Neo4j connection:
 `NEO4J_URI` (default `bolt://localhost:7687`), `NEO4J_DB` (default `diseasekg`), `NEO4J_USER`, `NEO4J_PASSWORD`.
 
 ## Vietnamese version (tag `v2`)
