@@ -13,8 +13,12 @@ import os
 import re
 import time
 
-from common import work, read_jsonl, write_jsonl, TYPE_NAME
-from metrics import exact_match, exec_match, gold_rows
+import getpass
+
+if not os.environ.get('NEO4J_PASSWORD'):
+    os.environ['NEO4J_PASSWORD'] = getpass.getpass('Neo4j DBMS password (not echoed): ')
+from common import run, work, read_jsonl, write_jsonl, TYPE_NAME  # noqa: E402
+from metrics import exact_match, exec_match, gold_rows  # noqa: E402
 
 ap = argparse.ArgumentParser()
 ap.add_argument('--split', choices=['random', 'door1'], default='random')
@@ -24,6 +28,11 @@ ap.add_argument('--chatgpt', help='answers file of the 50-question sheet')
 a = ap.parse_args()
 
 gold = read_jsonl(work('data' if a.split == 'random' else 'door1/data', 'test.jsonl'))
+try:                                                          # wrong password or Neo4j not started: say so plainly
+    run('RETURN 1')
+except Exception as e:
+    raise SystemExit(f'DỪNG: không nối được Neo4j ({str(e).splitlines()[0][:120]}). Kiểm Neo4j Desktop đã Start, '
+                     'đúng CSDL, và gõ đúng mật khẩu.')
 cache = {}
 
 
