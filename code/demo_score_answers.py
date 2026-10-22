@@ -52,6 +52,9 @@ em_n = ex_n = 0
 items = []
 for q, (topic, gold) in GOLD.items():
     pred = ans.get(q, '')
+    if not gold_rows(gold):                                   # a gold query with no rows means the wrong database
+        sys.exit(f"DỪNG: câu đúng {q} ra 0 dòng. Kiểm CSDL đang nối (NEO4J_DB={os.environ.get('NEO4J_DB', 'mặc định')}), "
+                 "phải là diseasekg-vi và Neo4j đã Start.")
     em, ex = exact_match(pred, gold), exec_match(pred, gold_rows(gold))
     em_n, ex_n = em_n + em, ex_n + ex
     items.append(dict(id=q, topic=topic, gold=gold, pred=pred, em=em, ex=ex))

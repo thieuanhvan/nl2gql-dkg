@@ -32,6 +32,9 @@ for line in text.splitlines():
     m = re.match(r'\s*\**\s*([A-Z]\d+)\s*\**\s*:\s*(.+)', line)
     if m:
         ans[m.group(1)] = m.group(2).strip()
+if not gold_rows(gold[0]['gql']):                             # every gold query returned rows when it was built
+    sys.exit(f"DỪNG: câu đúng {gold[0]['id']} ra 0 dòng. Kiểm CSDL đang nối (NEO4J_DB={os.environ.get('NEO4J_DB', 'mặc định')}), "
+             "phải là diseasekg-vi và Neo4j đã Start.")
 t0 = time.time()
 items = []
 for g in gold:

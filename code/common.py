@@ -1,7 +1,7 @@
 # common.py - paths, Neo4j connection and small helpers shared by every script.
 # <ROOT> is the folder that contains code/ (for example D:/Labs/nl2gql); every result is written under <ROOT>/work.
 # Neo4j connection from environment variables: NEO4J_URI (default bolt://localhost:7687 = Neo4j Desktop),
-# NEO4J_DB (default diseasekg), NEO4J_USER (default neo4j), NEO4J_PASSWORD (your DBMS password).
+# NEO4J_DB (default diseasekg, or diseasekg-vi when NL2GQL_LANG=vi), NEO4J_USER (default neo4j), NEO4J_PASSWORD (your DBMS password).
 import json
 import os
 import random
@@ -54,7 +54,7 @@ def driver():
 
 def session(write=False):
     import neo4j
-    return driver().session(database=os.environ.get('NEO4J_DB', 'diseasekg'),
+    return driver().session(database=os.environ.get('NEO4J_DB', 'diseasekg-vi' if LANG == 'vi' else 'diseasekg'),
                             default_access_mode=neo4j.WRITE_ACCESS if write else neo4j.READ_ACCESS)
 
 
