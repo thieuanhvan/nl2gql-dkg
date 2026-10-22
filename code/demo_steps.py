@@ -10,7 +10,9 @@
 # Usage (from the folder that contains code/ and work/):
 #   python code/demo_steps.py                     test_0161, ft7_relcn
 #   python code/demo_steps.py --id test_0108 --job ft7_full
+#   python code/demo_steps.py --id train_0055                 train/dev questions: steps 3b-4 only
 import argparse
+import glob
 import json
 import os
 import re
@@ -33,15 +35,16 @@ def head(title):
     print(title)
 
 
-test = {x['id']: x for x in rd(f'{W}/data_kaggle/test.jsonl')}
-if a.id not in test:
-    sys.exit(f'{a.id} not in {W}/data_kaggle/test.jsonl')
-q = test[a.id]
+split = a.id.split('_')[0]                                 # train_0055, dev_0001 or test_0108
+rows = {x['id']: x for x in rd(f'{W}/data_kaggle/{split}.jsonl')}
+if a.id not in rows:
+    sys.exit(f'{a.id} not in {W}/data_kaggle/{split}.jsonl')
+q = rows[a.id]
 tid = re.sub(r'_\d+$', '', q['tid'])                       # G1_5_00_1 -> template G1_5_00
 m = re.match(r'G(\d+)_', tid)
 rnd = int(m.group(1)) if m else 0
 
-head(f'CÂU TEST {a.id}  loại {q["type"]} ({q["type_name"]})  template {tid}')
+head(f'CÂU {split.upper()} {a.id}  loại {q["type"]} ({q["type_name"]})  template {tid}')
 print('  Câu hỏi:', q['nl'])
 print('  Cypher đúng:', q['gql'])
 
@@ -60,8 +63,17 @@ else:
     allc = rd(f'{W}/gpt/candidates/round{rnd}.jsonl')
     inpool = sum(1 for x in rd(f'{W}/gpt/pool.jsonl') if x.get('source') == 'chatgpt' and x.get('round') == rnd)
     print(f'  vòng {rnd}: ChatGPT đề xuất {len(allc)} cặp; vào kho (work/gpt/pool.jsonl) {inpool} template')
-    print('  cặp này:', 'QUA' if cand and not cand['problems'] else f'LOẠI {cand["problems"] if cand else "?"}')
     cot = next((x for x in rd(f'{W}/gpt/candidates/cot_round{rnd}.jsonl') if x['tid'] == tid), None)
+    early = None
+    if cot is None:                                         # pair already in the pool from an earlier, interrupted run
+        for f in sorted(glob.glob(f'{W}/gpt/_archived_*/cot_round{rnd}.jsonl')):
+            early = next((x for x in rd(f) if x['tid'] == tid), None) or early
+            if early:
+                cot, src = early, f
+    if early:
+        print(f'  cặp này: QUA ở lần chạy đầu ({src}); lần chạy lại thấy đã có trong kho nên ghi "trùng"')
+    else:
+        print('  cặp này:', 'QUA' if cand and not cand['problems'] else f'LOẠI {cand["problems"] if cand else "?"}')
     if cot:
         head(f'BƯỚC 3d-3e  CoT: ChatGPT giải thích truy vấn rồi viết lại câu hỏi; giữ câu có độ giống >= 0.8')
         print('  Giải thích :', cot['cot'])
@@ -75,13 +87,20 @@ for sp in ('train', 'dev', 'test'):
     print(f'  {sp}: {len(rows)} câu cùng template', '' if not rows else f'(ví dụ: {rows[0]["nl"]})')
 print('  -> câu test và câu train cùng template, chỉ khác tên thực thể')
 
-head('BƯỚC 4  schema liên quan đưa vào prompt (label linker + A*, work/data_kaggle/test.jsonl)')
+head(f'BƯỚC 4  schema liên quan đưa vào prompt ({"vàng, từ câu Cypher đúng" if split == "train" else "label linker + A*"}; work/data_kaggle/{split}.jsonl)')
 print('  nodes:', q['nodes'], '| edges:', [e[0] for e in q['edges']])
 ctx = q['ctx_rel_cn']
 k = ctx.find('Edges')                                        # the edge list is what decides the Cypher pattern
-print('  ' + ctx[k if k >= 0 else 0:].strip().replace('\n', '\n  '))
+if q['edges']:
+    print('  ' + ctx[k if k >= 0 else 0:].strip().replace('\n', '\n  '))
+else:
+    print('  (không có cạnh: câu chỉ hỏi thuộc tính của một nút)')
 print(f'  (cả đoạn schema trong prompt: {len(ctx)} ký tự)')
 
+if split != 'test':                                         # the models only wrote Cypher for test questions
+    head(f'Câu {split}: mô hình học câu này ở Bước 6 (train) hoặc để riêng (dev); chỉ câu test mới có Cypher mô hình viết')
+    print(LINE)
+    sys.exit(0)
 head(f'BƯỚC 6  Cypher mô hình {a.job} viết trên Kaggle (work/out/random/preds/{a.job}.jsonl)')
 pred = next((x for x in rd(f'{W}/out/random/preds/{a.job}.jsonl') if x['id'] == a.id), {})
 print('  ', pred.get('pred'))
