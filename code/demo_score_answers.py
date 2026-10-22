@@ -1,11 +1,14 @@
 # demo_score_answers.py - score a small set of answers "Qxx: <Cypher>" against gold queries, showing EM and EX step
 # by step: the clause sets that EM compares and the result rows that EX compares. Default: the 8 Đái tháo đường
 # (diabetes) questions of demo_chatgpt_web_prompt.txt and the ChatGPT answers saved in work/chatgpt_web_demo/.
+# Output: work/scores/ask/<answers file name>_<YYYYMMDD_HHMM>.json (EM, EX total and per question).
 # Usage (from the folder that contains code/ and work/; needs the Neo4j password for EX):
 #   python code/demo_score_answers.py                                   ChatGPT API answers of 22/10
 #   python code/demo_score_answers.py work/chatgpt_web_demo/my_answers.txt   any file with lines "Qxx: <Cypher>"
 import getpass
+import json
 import os
+import time
 import re
 import sys
 
@@ -46,10 +49,12 @@ def rows(q):
 
 
 em_n = ex_n = 0
+items = []
 for q, (topic, gold) in GOLD.items():
     pred = ans.get(q, '')
     em, ex = exact_match(pred, gold), exec_match(pred, gold_rows(gold))
     em_n, ex_n = em_n + em, ex_n + ex
+    items.append(dict(id=q, topic=topic, gold=gold, pred=pred, em=em, ex=ex))
     print(LINE)
     print(f'{q} ({topic})')
     print('  đúng   :', gold)
@@ -64,3 +69,8 @@ for q, (topic, gold) in GOLD.items():
 print(LINE)
 n = len(GOLD)
 print(f'Tổng {n} câu: EM {em_n}/{n} = {100 * em_n / n:.2f}%   EX {ex_n}/{n} = {100 * ex_n / n:.2f}%   ({path})')
+os.makedirs('work/scores/ask', exist_ok=True)                 # keep the scores, not only the screen output
+out = f"work/scores/ask/{os.path.basename(path).rsplit('.', 1)[0]}_{time.strftime('%Y%m%d_%H%M')}.json"
+json.dump(dict(answers=path, n=n, EM=round(100 * em_n / n, 2), EX=round(100 * ex_n / n, 2), items=items),
+          open(out, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+print('saved', out)
